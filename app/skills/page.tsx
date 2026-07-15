@@ -19,6 +19,9 @@ async function getPublicSkills() {
       author: {
         select: { name: true },
       },
+      _count: {
+        select: { likes: true },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -68,9 +71,11 @@ export default async function SkillsPage() {
                   <span className="text-sm text-base-content/60">
                     by {skill.author.name}
                   </span>
-                  <span className="text-xs text-base-content/50">
-                    {new Date(skill.createdAt).toLocaleDateString()}
-                  </span>
+                  <div className="flex items-center gap-2 text-xs text-base-content/50">
+                    <span>{new Date(skill.createdAt).toLocaleDateString()}</span>
+                    <span>•</span>
+                    <span>{skill._count.likes} {(skill._count.likes === 1 ? "like" : "likes")}</span>
+                  </div>
                 </div>
               </div>
             </Link>

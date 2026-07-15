@@ -12,6 +12,7 @@ model User {
   name      String?
   password  String
   skills    Skill[]
+  likedSkills SkillLike[]
   createdAt DateTime @default(now()) @map("created_at")
   
   @@map("users")
@@ -23,10 +24,24 @@ model Skill {
   description String?  @db.VarChar(500)
   content     String?  @db.Text
   isPublic    Boolean  @default(true) @map("is_public")
-  authorId      Int    @map("author_id")
+  authorId    Int      @map("author_id")
   author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes       SkillLike[]
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   
   @@map("skills")
+}
+
+model SkillLike {
+  skillId   Int      @map("skill_id")
+  userId    Int      @map("user_id")
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([skillId, userId])
+  @@index([skillId])
+  @@index([userId])
+  @@map("skill_likes")
 }

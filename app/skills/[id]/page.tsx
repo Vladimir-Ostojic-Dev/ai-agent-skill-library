@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+import LikeButton from "@/components/LikeButton";
 
 /**
  * Skill Detail Page - Dynamic Route with ISR
@@ -36,6 +38,9 @@ async function getSkill(id: string) {
       author: {
         select: { name: true },
       },
+      _count: {
+        select: { likes: true },
+      },
     },
   });
   return skill;
@@ -44,10 +49,22 @@ async function getSkill(id: string) {
 export default async function SkillDetailPage({ params }: PageProps) {
   const { id } = await params;
   const skill = await getSkill(id);
+  const currentUser = await getCurrentUser();
 
   if (!skill) {
     notFound();
   }
+
+  const userLike = currentUser
+    ? await prisma.skillLike.findUnique({
+        where: {
+          skillId_userId: {
+            skillId: skill.id,
+            userId: currentUser.userId,
+          },
+        },
+      })
+    : null;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -75,6 +92,17 @@ export default async function SkillDetailPage({ params }: PageProps) {
             <span>Created {new Date(skill.createdAt).toLocaleDateString()}</span>
             <span>•</span>
             <span>Updated {new Date(skill.updatedAt).toLocaleDateString()}</span>
+            <span>•</span>
+            <span>{skill._count.likes} {(skill._count.likes === 1 ? "like" : "likes")}</span>
+          </div>
+
+          <div className="mb-6">
+            <LikeButton
+              skillId={skill.id}
+              initialLikesCount={skill._count.likes}
+              initialLikedByUser={Boolean(userLike)}
+              canLike={Boolean(currentUser)}
+            />
           </div>
 
           <div className="bg-base-300 rounded-lg p-6">

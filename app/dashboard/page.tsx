@@ -12,6 +12,7 @@ interface Skill {
   description: string;
   isPublic: boolean;
   createdAt: string;
+  likesCount: number;
 }
 
 /**
@@ -32,28 +33,30 @@ export default function DashboardPage() {
   }, [isLoading, isAuthenticated, router]);
 
   useEffect(() => {
-    if (user) {
-      fetchUserSkills();
+    if (!user) {
+      return;
     }
-  }, [user]);
 
-  const fetchUserSkills = async () => {
-    try {
-      // Cookies are automatically sent with fetch
-      const response = await fetch("/api/skills", {
-        credentials: "include",
-      });
+    const loadSkills = async () => {
+      try {
+        // Cookies are automatically sent with fetch
+        const response = await fetch("/api/skills", {
+          credentials: "include",
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        setSkills(data.skills || []);
+        if (response.ok) {
+          const data = await response.json();
+          setSkills(data.skills || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch skills:", error);
+      } finally {
+        setLoadingSkills(false);
       }
-    } catch (error) {
-      console.error("Failed to fetch skills:", error);
-    } finally {
-      setLoadingSkills(false);
-    }
-  };
+    };
+
+    void loadSkills();
+  }, [user]);
 
   const handleDelete = async (id: number) => {
     if (!user || !confirm("Are you sure you want to delete this skill?")) {
@@ -161,6 +164,9 @@ export default function DashboardPage() {
                 </div>
                 <p className="text-base-content/70 text-sm line-clamp-2">
                   {skill.description}
+                </p>
+                <p className="text-xs text-base-content/60 mt-2">
+                  {skill.likesCount} {(skill.likesCount === 1 ? "like" : "likes")}
                 </p>
                 <div className="card-actions justify-end mt-4">
                   <Link

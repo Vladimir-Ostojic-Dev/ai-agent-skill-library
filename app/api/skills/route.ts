@@ -25,10 +25,22 @@ export async function GET(request: NextRequest) {
         description: true,
         isPublic: true,
         createdAt: true,
+        _count: {
+          select: { likes: true },
+        },
       },
     });
 
-    return NextResponse.json({ skills });
+    const skillsWithLikes = skills.map((skill) => ({
+      id: skill.id,
+      name: skill.name,
+      description: skill.description,
+      isPublic: skill.isPublic,
+      createdAt: skill.createdAt,
+      likesCount: skill._count.likes,
+    }));
+
+    return NextResponse.json({ skills: skillsWithLikes });
   } catch (error) {
     console.error("Get skills error:", error);
     return NextResponse.json(
