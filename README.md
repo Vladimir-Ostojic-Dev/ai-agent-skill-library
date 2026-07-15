@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-https://vercel.com/vladimir-ostojic/ai-agent-skill-library
+https://ai-agent-skill-library-kmklleggs-vladimir-ostojic.vercel.app
 
 ## Getting Started
 
