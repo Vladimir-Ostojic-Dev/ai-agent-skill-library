@@ -13,6 +13,8 @@ model User {
   password  String
   skills    Skill[]
   likedSkills SkillLike[]
+  comments  SkillComment[]
+  likedComments SkillCommentLike[]
   createdAt DateTime @default(now()) @map("created_at")
   
   @@map("users")
@@ -27,6 +29,7 @@ model Skill {
   authorId    Int      @map("author_id")
   author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   likes       SkillLike[]
+  comments    SkillComment[]
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   
@@ -44,4 +47,33 @@ model SkillLike {
   @@index([skillId])
   @@index([userId])
   @@map("skill_likes")
+}
+
+model SkillComment {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.VarChar(1000)
+  skillId   Int      @map("skill_id")
+  authorId  Int      @map("author_id")
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes     SkillCommentLike[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([skillId, createdAt])
+  @@index([authorId])
+  @@map("skill_comments")
+}
+
+model SkillCommentLike {
+  commentId Int      @map("comment_id")
+  userId    Int      @map("user_id")
+  comment   SkillComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+  @@map("skill_comment_likes")
 }

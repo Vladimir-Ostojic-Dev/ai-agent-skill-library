@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import LikeButton from "@/components/LikeButton";
+import SkillComments from "@/components/SkillComments";
 
 /**
  * Skill Detail Page - Dynamic Route with ISR
@@ -111,6 +112,8 @@ export default async function SkillDetailPage({ params }: PageProps) {
               {skill.content}
             </pre>
           </div>
+
+          <SkillComments skillId={skill.id} canComment={Boolean(currentUser)} />
         </div>
       </article>
     </div>
